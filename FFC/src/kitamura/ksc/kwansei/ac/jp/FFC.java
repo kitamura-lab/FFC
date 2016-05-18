@@ -2,6 +2,8 @@ package kitamura.ksc.kwansei.ac.jp;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,11 +19,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class FFC extends JFrame {
+/**
+ * @author Kitamura
+ *
+ */
+public class FFC extends JFrame implements WindowListener {
 
 	private static final long serialVersionUID = 1L;
-	
-	static String version = "1.1"; //2016/04/14
+
+	static String version = "1.2"; // 2016/05/18
 
 	JLabel label2, label3;
 	String home = "C:\\Users\\kitamura\\Documents\\FIGHTERS";
@@ -34,15 +40,19 @@ public class FFC extends JFrame {
 
 	Folder folder[] = new Folder[100];
 
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) {
 
-		new FFC("FFC"+version);
+		new FFC("FFC" + version);
 	}
 
 	FFC(String title) {
 		setTitle(title);
 		setBounds(100, 100, 600, 100);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		addWindowListener(this);
 		setVisible(true);
 
 		JPanel p = new JPanel();
@@ -173,9 +183,10 @@ public class FFC extends JFrame {
 			}
 		} else {
 			// ファイルのコピー
-			if(dest.exists()){
-				//System.out.println("Exist: "+dest.getAbsolutePath().toString());
-				label2.setText("SKIP: "+ src.getAbsolutePath().toString());
+			if (dest.exists()) {
+				// System.out.println("Exist:
+				// "+dest.getAbsolutePath().toString());
+				label2.setText("SKIP: " + src.getAbsolutePath().toString());
 				return;
 			}
 			try {
@@ -196,5 +207,46 @@ public class FFC extends JFrame {
 			}
 			label2.setText(src.getAbsolutePath().toString());
 		}
+	}
+
+	public void windowClosing(WindowEvent e) {
+		// textArea.append("Window closing" + newline);
+		System.out.println("BYE");
+		try {
+			Runtime rt = Runtime.getRuntime();
+			Process pr = rt.exec("UnplugDrive.exe");
+			// InputStream is = pr.getInputStream();
+			// vecOsOutput = StreamToVector(is);
+
+			pr.waitFor();
+		} catch (Exception ex) {
+			//System.out.println("interrupted!!!");
+			ex.printStackTrace();
+		}
+	}
+
+	public void windowClosed(WindowEvent e) {
+		// textArea.append("Window closed" + newline);
+		// System.out.println("END");
+	}
+
+	public void windowOpened(WindowEvent e) {
+		// textArea.append("Window opened" + newline);
+	}
+
+	public void windowIconified(WindowEvent e) {
+		// textArea.append("Window iconified" + newline);
+	}
+
+	public void windowDeiconified(WindowEvent e) {
+		// textArea.append("Window deiconified" + newline);
+	}
+
+	public void windowActivated(WindowEvent e) {
+		// textArea.append("Window activated" + newline);
+	}
+
+	public void windowDeactivated(WindowEvent e) {
+		// textArea.append("Window deactivated" + newline);
 	}
 }
