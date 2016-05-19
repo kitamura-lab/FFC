@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.StringTokenizer;
 import java.util.logging.FileHandler;
@@ -31,7 +32,7 @@ public class FFC extends JFrame implements WindowListener {
 
 	private static final long serialVersionUID = 1L;
 
-	static String version = "1.2"; // 2016/05/18
+	static String version = "2.0"; // 2016/05/19
 	final String logfile = "FFC.log";
 	private Logger logger = null;
 
@@ -63,11 +64,10 @@ public class FFC extends JFrame implements WindowListener {
 			logger.addHandler(fh);
 		} catch (IOException e) {
 			e.printStackTrace();
-			//logger.log(Level.SEVERE, "ERROR:", e);
+			// logger.log(Level.SEVERE, "ERROR:", e);
 		}
 		logger.setLevel(Level.CONFIG);
-		
-		
+
 		// フレームの初期化
 		setTitle(title);
 		setBounds(100, 100, 600, 100);
@@ -109,8 +109,10 @@ public class FFC extends JFrame implements WindowListener {
 				copyTransfer(home + "\\" + folder[i].name, dest + "\\" + monthday() + "\\" + folder[i].name);
 		}
 
-		label2.setText("END");
+		// システムファイルのコピー
+		copyTransfer(home + "\\SYSTEM", ".\\");
 
+		label2.setText("END");
 	}
 
 	void setting() {
@@ -148,7 +150,7 @@ public class FFC extends JFrame implements WindowListener {
 			ex.printStackTrace();
 			logger.log(Level.SEVERE, "ERROR:", ex);
 			label3.setText(ex.toString());
-			
+
 		}
 	}
 
@@ -194,10 +196,18 @@ public class FFC extends JFrame implements WindowListener {
 			}
 		} else {
 			// ファイルのコピー
-			//ファイルが存在すればスキップ
+			// ファイルが存在すればスキップ
 			if (dest.exists()) {
-				label2.setText("SKIP: " + src.getAbsolutePath().toString());
-				return;
+				Long timeDest = dest.lastModified();
+				Long timeSrc = src.lastModified();
+				//System.out.println(src.getName() +":"+ new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(timeSrc) + ":"
+				//		+ new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(timeDest));
+
+				if (timeDest > timeSrc) {
+					label2.setText("SKIP: " + src.getAbsolutePath().toString());
+					//System.out.println("SKIP: " + src.getAbsolutePath().toString());
+					return;
+				}
 			}
 			try {
 				FileInputStream fis = new FileInputStream(src);
@@ -223,7 +233,7 @@ public class FFC extends JFrame implements WindowListener {
 	public void windowClosing(WindowEvent e) {
 		System.out.println("BYE");
 		try {
-			//安全な取り外しの実行
+			// 安全な取り外しの実行
 			Runtime.getRuntime().exec("UnplugDrive.exe");
 		} catch (Exception ex) {
 			ex.printStackTrace();
