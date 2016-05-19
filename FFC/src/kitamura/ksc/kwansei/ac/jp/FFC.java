@@ -11,7 +11,6 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.StringTokenizer;
 import java.util.logging.FileHandler;
