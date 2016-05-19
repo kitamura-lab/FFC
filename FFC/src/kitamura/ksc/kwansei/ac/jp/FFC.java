@@ -9,9 +9,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.Calendar;
 import java.util.StringTokenizer;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +32,8 @@ public class FFC extends JFrame implements WindowListener {
 	private static final long serialVersionUID = 1L;
 
 	static String version = "1.2"; // 2016/05/18
+	final String logfile = "FFC.log";
+	private Logger logger = null;
 
 	JLabel label2, label3;
 	String home = "C:\\Users\\kitamura\\Documents\\FIGHTERS";
@@ -49,6 +55,19 @@ public class FFC extends JFrame implements WindowListener {
 	}
 
 	FFC(String title) {
+		/* ログファイルの初期化 */
+		logger = Logger.getLogger(this.getClass().getName());
+		try {
+			FileHandler fh = new FileHandler(logfile);
+			fh.setFormatter(new java.util.logging.SimpleFormatter());
+			logger.addHandler(fh);
+		} catch (IOException e) {
+			e.printStackTrace();
+			//logger.log(Level.SEVERE, "ERROR:", e);
+		}
+		logger.setLevel(Level.CONFIG);
+		
+		
 		// フレームの初期化
 		setTitle(title);
 		setBounds(100, 100, 600, 100);
@@ -124,12 +143,12 @@ public class FFC extends JFrame implements WindowListener {
 			// 終了処理
 			br.close();
 
-		} catch (
-
-		Exception ex) {
+		} catch (Exception ex) {
 			// 例外発生時処理
 			ex.printStackTrace();
+			logger.log(Level.SEVERE, "ERROR:", ex);
 			label3.setText(ex.toString());
+			
 		}
 	}
 
@@ -195,6 +214,7 @@ public class FFC extends JFrame implements WindowListener {
 				fos.close();
 			} catch (Exception ex) {
 				ex.printStackTrace();
+				logger.log(Level.SEVERE, "ERROR:", ex);
 				label3.setText(ex.toString());
 				;
 			}
@@ -209,6 +229,7 @@ public class FFC extends JFrame implements WindowListener {
 			Runtime.getRuntime().exec("UnplugDrive.exe");
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			logger.log(Level.SEVERE, "ERROR:", ex);
 		}
 	}
 
