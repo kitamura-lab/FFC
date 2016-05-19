@@ -187,16 +187,14 @@ public class FFC extends JFrame implements WindowListener {
 			}
 
 			String[] files = src.list();
-
 			for (String file : files) {
-
 				File srcFile = new File(src, file);
 				File destFile = new File(dest, file);
-
 				copyTransfer(srcFile, destFile);
 			}
 		} else {
 			// ファイルのコピー
+			//ファイルが存在すればスキップ
 			if (dest.exists()) {
 				label2.setText("SKIP: " + src.getAbsolutePath().toString());
 				return;
