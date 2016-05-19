@@ -49,6 +49,7 @@ public class FFC extends JFrame implements WindowListener {
 	}
 
 	FFC(String title) {
+		// フレームの初期化
 		setTitle(title);
 		setBounds(100, 100, 600, 100);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -56,11 +57,9 @@ public class FFC extends JFrame implements WindowListener {
 		setVisible(true);
 
 		JPanel p = new JPanel();
-
 		JLabel label1 = new JLabel("Status: ");
 		label2 = new JLabel();
 		label3 = new JLabel();
-
 		p.add(label1);
 		p.add(label2);
 		p.add(label3);
@@ -68,13 +67,16 @@ public class FFC extends JFrame implements WindowListener {
 		Container contentPane = getContentPane();
 		contentPane.add(p, BorderLayout.CENTER);
 
+		// フォルダ情報の初期化
 		for (int i = 0; i < folder.length; i++) {
 			folder[i] = new Folder();
 			folder[i].flag = 0;
 		}
 
+		// 設定ファイルの読込
 		setting();
 
+		// ビデオフォルダの生成
 		File f = new File(dest);
 		if (!f.exists())
 			f.mkdir();
@@ -82,6 +84,7 @@ public class FFC extends JFrame implements WindowListener {
 		if (!f.exists())
 			f.mkdir();
 
+		// ビデオのコピー
 		for (int i = 0; i < folder.length; i++) {
 			if (folder[i].flag == 1)
 				copyTransfer(home + "\\" + folder[i].name, dest + "\\" + monthday() + "\\" + folder[i].name);
@@ -100,23 +103,16 @@ public class FFC extends JFrame implements WindowListener {
 			// 読み込んだファイルを１行ずつ処理する
 			String line;
 			StringTokenizer token;
-			// line = br.readLine();
-			// token = new StringTokenizer(line, ",");
 
 			int i = 0;
 			while ((line = br.readLine()) != null) {
 				// 区切り文字","で分割する
-				// System.out.println(line);
 				token = new StringTokenizer(line, ",");
-				// while (token.hasMoreTokens()) {
-				// System.out.println(token.nextToken());
 				String id = token.nextToken();
 				if (id.equals("HOME")) {
-					// token.nextToken();
 					Pattern p = Pattern.compile("\\\\");
 					Matcher m = p.matcher(token.nextToken());
 					home = m.replaceAll("\\\\\\\\");
-
 				} else if (id.equals("DEST")) {
 					dest = ".\\" + token.nextToken();
 				} else {
@@ -124,7 +120,6 @@ public class FFC extends JFrame implements WindowListener {
 					folder[i].flag = Integer.parseInt(token.nextToken());
 					i++;
 				}
-				// }
 			}
 			// 終了処理
 			br.close();
@@ -184,8 +179,6 @@ public class FFC extends JFrame implements WindowListener {
 		} else {
 			// ファイルのコピー
 			if (dest.exists()) {
-				// System.out.println("Exist:
-				// "+dest.getAbsolutePath().toString());
 				label2.setText("SKIP: " + src.getAbsolutePath().toString());
 				return;
 			}
@@ -210,43 +203,30 @@ public class FFC extends JFrame implements WindowListener {
 	}
 
 	public void windowClosing(WindowEvent e) {
-		// textArea.append("Window closing" + newline);
 		System.out.println("BYE");
 		try {
-			Runtime rt = Runtime.getRuntime();
-			Process pr = rt.exec("UnplugDrive.exe");
-			// InputStream is = pr.getInputStream();
-			// vecOsOutput = StreamToVector(is);
-
-			pr.waitFor();
+			//安全な取り外しの実行
+			Runtime.getRuntime().exec("UnplugDrive.exe");
 		} catch (Exception ex) {
-			//System.out.println("interrupted!!!");
 			ex.printStackTrace();
 		}
 	}
 
 	public void windowClosed(WindowEvent e) {
-		// textArea.append("Window closed" + newline);
-		// System.out.println("END");
 	}
 
 	public void windowOpened(WindowEvent e) {
-		// textArea.append("Window opened" + newline);
 	}
 
 	public void windowIconified(WindowEvent e) {
-		// textArea.append("Window iconified" + newline);
 	}
 
 	public void windowDeiconified(WindowEvent e) {
-		// textArea.append("Window deiconified" + newline);
 	}
 
 	public void windowActivated(WindowEvent e) {
-		// textArea.append("Window activated" + newline);
 	}
 
 	public void windowDeactivated(WindowEvent e) {
-		// textArea.append("Window deactivated" + newline);
 	}
 }
