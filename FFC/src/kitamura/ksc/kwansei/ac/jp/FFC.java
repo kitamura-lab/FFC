@@ -24,8 +24,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
- * @author Kitamura
- *
+ * ファイルをモバイルデバイスにコピーするプログラム<br>
+ * <br>
+ * 設定はFFCConfig.csvファイルに記述します．<br>
+ * HOME: ソースフォルダのパス．ここにポジションごとのフォルダを置きます．<br>
+ * DEST: デスティネーションフォルダのパス．FFCの置かれているフォルダからの相対パスです．<br>
+ * ポジション：HOMEに置かれたポジションフォルダを1であればコピーする，0であればコピーしない．<br>
+ * <br>
+ * 実行すると日付のついたフォルダをDESTに生成し，その中にポジションフォルダを自動的にコピーします．同じ名前のファイルが存在する場合はコピーしません．<br>
+ * ウィンドウを閉じると「安全な取り外し」が行われます．<br>
+ * HOMEにSYSTEMフォルダを置くと，その中のファイルがDESTにコピーされます．
+ * 同じ名前のファイルが存在する場合は，タイムスタンプが新しければコピーされます．FFC.jarのバージョンアップに利用することができます．<br>
+ * @author Yasuhiko Kitamura
  */
 public class FFC extends JFrame implements WindowListener {
 
@@ -47,7 +57,7 @@ public class FFC extends JFrame implements WindowListener {
 	Folder folder[] = new Folder[100];
 
 	/**
-	 * @param args
+	 * @param args 使用しない
 	 */
 	public static void main(String[] args) {
 
@@ -230,7 +240,7 @@ public class FFC extends JFrame implements WindowListener {
 	}
 
 	public void windowClosing(WindowEvent e) {
-		System.out.println("BYE");
+		//System.out.println("BYE");
 		try {
 			// 安全な取り外しの実行
 			Runtime.getRuntime().exec("UnplugDrive.exe");
