@@ -1,4 +1,4 @@
-package kitamura.ksc.kwansei.ac.jp;
+package kitamura.ffc;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
