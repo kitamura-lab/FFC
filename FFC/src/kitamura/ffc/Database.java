@@ -3,6 +3,7 @@ package kitamura.ffc;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Database {
@@ -20,6 +21,10 @@ public class Database {
 		try {
 			Class.forName("org.sqlite.JDBC");
 			connection = DriverManager.getConnection("jdbc:sqlite:video.db");
+			Statement statement = connection.createStatement();
+			statement.executeUpdate("create table video(name, watch)");
+		} catch (SQLException e) {
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
