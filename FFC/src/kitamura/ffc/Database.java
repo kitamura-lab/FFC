@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 public class Database {
 	Connection connection = null;
@@ -84,13 +85,18 @@ public class Database {
 		}
 	}
 
-	void getVideo() {
+	ArrayList<Video> getVideo() {
+		ArrayList<Video> video = new ArrayList<Video>();
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
 			String sql = "select * from video";
 			ResultSet rs = statement.executeQuery(sql);
 			while (rs.next()) {
+				Video v = new Video();
+				v.name = rs.getString(1);
+				v.watch = rs.getInt(2);
+				video.add(v);
 				System.out.println(rs.getString(1)+rs.getString(2));
 			}
 		} catch (Exception e) {
@@ -104,6 +110,7 @@ public class Database {
 				e.printStackTrace();
 			}
 		}
+		return video;
 	}
 
 }
