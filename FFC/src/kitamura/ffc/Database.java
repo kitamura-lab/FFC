@@ -84,6 +84,17 @@ public class Database {
 			}
 		}
 	}
+	
+	void setVideo(String video, int watch){
+		try{
+			Statement statement = connection.createStatement();
+			statement.executeUpdate("delete from video where name=\""+video+"\"");
+			statement.executeUpdate("insert into video values(\"" + video + "\","+watch+")");
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+	}
 
 	ArrayList<Video> getVideo() {
 		ArrayList<Video> video = new ArrayList<Video>();

@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -20,6 +21,7 @@ public class FVL extends JFrame implements TreeSelectionListener {
 	Database db;
 	DefaultMutableTreeNode root;
 	JTree tree;
+	JLabel jl;
 
 	public static void main(String[] args) {
 		new FVL("FVL " + "ver." + version);
@@ -42,13 +44,20 @@ public class FVL extends JFrame implements TreeSelectionListener {
 		scrollPane.setPreferredSize(new Dimension(500, 500));
 
 		JPanel p = new JPanel();
-		p.add(scrollPane);
+		//p.setLayout(new BorderLayout());
+		jl = new JLabel("");	
+		jl.setPreferredSize(new Dimension(500, 20));
+		p.add(jl, BorderLayout.NORTH);
+		p.add(scrollPane, BorderLayout.CENTER);
 
-		getContentPane().add(p, BorderLayout.CENTER);
+		//getContentPane().add(p, BorderLayout.CENTER);
+
+		getContentPane().add(p);
 
 		db = new Database();
 
 		addVideo();
+		showStatus();
 
 		setVisible(true);
 		// tree.setRootVisible(true);
@@ -64,26 +73,45 @@ public class FVL extends JFrame implements TreeSelectionListener {
 	void addVideo() {
 		ArrayList<Video> v = db.getVideo();
 		for (int i = 0; i < v.size(); i++) {
-			root.add(new DefaultMutableTreeNode(v.get(i).name));
+			String header="";
+			if(v.get(i).watch==0) header="[未]"; else header = "[済]";
+			root.add(new DefaultMutableTreeNode(header+v.get(i).name));
 		}
+	}
+	
+	void showStatus(){
+		ArrayList<Video> v = db.getVideo();
+		int count=0;
+		for (int i = 0; i < v.size(); i++) {
+			if(v.get(i).watch==1) count++;
+		}
+		jl.setText(""+v.size()+"本中"+count+"本見ました！");
+		
 	}
 
 	public void valueChanged(TreeSelectionEvent e) {
 		try {
 			TreePath path = tree.getSelectionPath();
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-			System.out.println(node);
+			String file = node.toString().substring(3);
+			System.out.println(file);
 			// Runtime r = Runtime.getRuntime();
 
 			// Process process = r.exec("C:\\Program Files
 			// (x86)\\VideoLAN\\VLC\\vlc.exe "+node);
-			ProcessBuilder pb = new ProcessBuilder("C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe", node.toString());
+			
+			ProcessBuilder pb = new ProcessBuilder("C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe", file);
 			Process process = pb.start();
 			int ret = process.waitFor();
+			
+			node.setUserObject(new DefaultMutableTreeNode("[済]"+file));
+			db.setVideo(file,1);
+			showStatus();
 			tree.clearSelection();
 		} catch (Exception ex) {
 			//ex.printStackTrace();
 		}
+		
 
 	}
 
