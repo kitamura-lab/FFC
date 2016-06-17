@@ -75,7 +75,34 @@ public class FVL extends JFrame implements TreeSelectionListener {
 		for (int i = 0; i < v.size(); i++) {
 			String header="";
 			if(v.get(i).watch==0) header="[未]"; else header = "[済]";
-			root.add(new DefaultMutableTreeNode(header+v.get(i).name));
+			String path = v.get(i).name;
+			if(path.indexOf("\\")<0) continue;
+			path = path.substring(2);
+			//System.out.println(path.substring(0,path.indexOf("\\")));
+			root.setUserObject(new DefaultMutableTreeNode(path.substring(0,path.indexOf("\\"))));
+			DefaultMutableTreeNode node = root;
+			path = path.substring(path.indexOf("\\")+1);
+			while(path.indexOf("\\")>0){
+				String nodeName = path.substring(0, path.indexOf("\\"));
+				//System.out.println(nodeName);
+				DefaultMutableTreeNode node1 = null;
+				for(int j=0; j<node.getChildCount();j++){
+					//System.out.println("CHILD:"+node.getChildAt(j));
+					if(((DefaultMutableTreeNode)node.getChildAt(j)).getUserObject().equals(nodeName)){
+						//System.out.println("FOUND"+nodeName);
+						node1 = (DefaultMutableTreeNode)node.getChildAt(j);
+						break;
+					}
+				}
+				if(node1==null) node1 = new DefaultMutableTreeNode(nodeName);
+				node.add(node1);
+				node = node1;
+				path = path.substring(path.indexOf("\\")+1);
+			}
+			//System.out.println(path);
+			node.add(new DefaultMutableTreeNode(header+path));
+			//System.out.println(path.substring(path.indexOf("\\")+1));
+			//root.add(new DefaultMutableTreeNode(header+v.get(i).name));
 		}
 	}
 	
@@ -100,6 +127,7 @@ public class FVL extends JFrame implements TreeSelectionListener {
 			// Process process = r.exec("C:\\Program Files
 			// (x86)\\VideoLAN\\VLC\\vlc.exe "+node);
 			
+			//file="FIGHTERS2";
 			ProcessBuilder pb = new ProcessBuilder("C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe", file);
 			Process process = pb.start();
 			int ret = process.waitFor();
