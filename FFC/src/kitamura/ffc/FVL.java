@@ -17,7 +17,7 @@ import javax.swing.tree.TreePath;
 
 public class FVL extends JFrame implements TreeSelectionListener {
 
-	static String version = "0.1";
+	static String version = "0.2";
 
 	Database db;
 	DefaultMutableTreeNode root;
@@ -35,25 +35,19 @@ public class FVL extends JFrame implements TreeSelectionListener {
 		setTitle(title);
 
 		root = new DefaultMutableTreeNode("Fighters");
-		// DefaultMutableTreeNode swing = new DefaultMutableTreeNode("Swing");
 		tree = new JTree(root);
 		model = (DefaultTreeModel) tree.getModel();
 		tree.addTreeSelectionListener(this);
-
-		// root.add(swing);
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.getViewport().setView(tree);
 		scrollPane.setPreferredSize(new Dimension(500, 500));
 
 		JPanel p = new JPanel();
-		// p.setLayout(new BorderLayout());
 		jl = new JLabel("");
 		jl.setPreferredSize(new Dimension(500, 20));
 		p.add(jl, BorderLayout.NORTH);
 		p.add(scrollPane, BorderLayout.CENTER);
-
-		// getContentPane().add(p, BorderLayout.CENTER);
 
 		getContentPane().add(p);
 
@@ -110,9 +104,7 @@ public class FVL extends JFrame implements TreeSelectionListener {
 			// System.out.println(path);
 			node.add(new DefaultMutableTreeNode(header + path));
 			// System.out.println(path.substring(path.indexOf("\\")+1));
-			// root.add(new DefaultMutableTreeNode(header+v.get(i).name));
 		}
-
 	}
 
 	void showStatus() {
@@ -150,10 +142,6 @@ public class FVL extends JFrame implements TreeSelectionListener {
 
 			checkVideo(node0);
 
-
-			// node.setUserObject(new DefaultMutableTreeNode("[済]"+file));
-			// db.setVideo(file,1);
-			// showStatus();
 			tree.clearSelection();
 		} catch (Exception ex) {
 			// ex.printStackTrace();
