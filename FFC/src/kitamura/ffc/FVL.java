@@ -37,7 +37,7 @@ public class FVL extends JFrame implements TreeSelectionListener {
 		root = new DefaultMutableTreeNode("Fighters");
 		// DefaultMutableTreeNode swing = new DefaultMutableTreeNode("Swing");
 		tree = new JTree(root);
-		model = (DefaultTreeModel)tree.getModel();
+		model = (DefaultTreeModel) tree.getModel();
 		tree.addTreeSelectionListener(this);
 
 		// root.add(swing);
@@ -60,17 +60,17 @@ public class FVL extends JFrame implements TreeSelectionListener {
 		db = new Database();
 
 		addVideo();
+
 		showStatus();
 
 		setVisible(true);
-		// tree.setRootVisible(true);
-
-		int row = 0;
+		
+		tree.expandRow(0);
+		int row = tree.getRowCount()-1;
 		while (row < tree.getRowCount()) {
 			tree.expandRow(row);
 			row++;
 		}
-
 	}
 
 	void addVideo() {
@@ -112,6 +112,7 @@ public class FVL extends JFrame implements TreeSelectionListener {
 			// System.out.println(path.substring(path.indexOf("\\")+1));
 			// root.add(new DefaultMutableTreeNode(header+v.get(i).name));
 		}
+
 	}
 
 	void showStatus() {
@@ -138,7 +139,7 @@ public class FVL extends JFrame implements TreeSelectionListener {
 				node = (DefaultMutableTreeNode) node.getParent();
 			}
 			file = ".\\" + file;
-			System.out.println(file);
+			//System.out.println(file);
 
 			ProcessBuilder pb = new ProcessBuilder("C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe", file);
 			Process process = pb.start();
@@ -146,7 +147,7 @@ public class FVL extends JFrame implements TreeSelectionListener {
 
 			checkVideo(node0);
 
-			//model.reload();
+
 			// node.setUserObject(new DefaultMutableTreeNode("[済]"+file));
 			// db.setVideo(file,1);
 			// showStatus();
@@ -157,13 +158,24 @@ public class FVL extends JFrame implements TreeSelectionListener {
 	}
 
 	void checkVideo(DefaultMutableTreeNode node) {
-		System.out.println(node.toString() + node.getChildCount());
+		//System.out.println(node.toString() + node.getChildCount());
 		if (node.getChildCount() == 0) {
 
 			String file = "[済]" + node.toString().substring(3);
-			System.out.println(node.toString()+":"+file);
+			//System.out.println(node.toString() + ":" + file);
 			node.setUserObject(new DefaultMutableTreeNode(file));
 			model.nodeChanged(node);
+			
+			file=node.toString().substring(3);
+			while (node.getParent() != null) {
+				file = node.getParent().toString() + "\\" + file;
+				node = (DefaultMutableTreeNode) node.getParent();
+			}
+			file = ".\\" + file;
+			//System.out.println("DB:"+file);
+			db.setVideo(file,1);
+			showStatus();
+			
 			return;
 		}
 
