@@ -141,9 +141,12 @@ public class FVL extends JFrame implements TreeSelectionListener {
 			file = ".\\" + file;
 			//System.out.println(file);
 
+			long start = System.currentTimeMillis();
 			ProcessBuilder pb = new ProcessBuilder("C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe", file);
 			Process process = pb.start();
 			process.waitFor();
+			long end = System.currentTimeMillis();
+			System.out.println((end - start)/1000  + "秒");
 
 			checkVideo(node0);
 
