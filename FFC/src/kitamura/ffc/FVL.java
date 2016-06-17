@@ -94,7 +94,7 @@ public class FVL extends JFrame implements TreeSelectionListener {
 			TreePath path = tree.getSelectionPath();
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
 			String file = node.toString().substring(3);
-			System.out.println(file);
+			//System.out.println(file);
 			// Runtime r = Runtime.getRuntime();
 
 			// Process process = r.exec("C:\\Program Files

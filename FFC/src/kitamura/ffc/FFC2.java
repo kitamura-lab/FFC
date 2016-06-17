@@ -228,7 +228,7 @@ public class FFC2 extends JFrame implements WindowListener {
 				FileOutputStream fos = new FileOutputStream(dest);
 				FileChannel destChannel = fos.getChannel();
 				srcChannel.transferTo(0, srcChannel.size(), destChannel);
-				System.out.println(dest);
+				//System.out.println(dest);
 				db.putVideo(dest.toString());
 				srcChannel.close();
 				destChannel.close();

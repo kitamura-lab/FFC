@@ -67,7 +67,7 @@ public class Database {
 			statement = connection.createStatement();
 			ResultSet rs = statement.executeQuery("select * from video where name=\""+video+"\"");
 			while (rs.next()) {
-				System.out.println("DUPLICATED:"+rs.getString(1)+rs.getString(2));
+				//System.out.println("DUPLICATED:"+rs.getString(1)+rs.getString(2));
 				return;
 			}
 			
@@ -108,7 +108,7 @@ public class Database {
 				v.name = rs.getString(1);
 				v.watch = rs.getInt(2);
 				video.add(v);
-				System.out.println(rs.getString(1)+rs.getString(2));
+				//System.out.println(rs.getString(1)+rs.getString(2));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
