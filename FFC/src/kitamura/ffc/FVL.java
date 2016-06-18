@@ -23,7 +23,7 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 	 */
 	private static final long serialVersionUID = 1L;
 
-	static String version = "1.0";
+	static String version = "1.1";
 
 	Database db;
 	DefaultMutableTreeNode root;

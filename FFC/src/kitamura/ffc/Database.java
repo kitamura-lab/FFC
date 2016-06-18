@@ -2,6 +2,7 @@ package kitamura.ffc;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -18,16 +19,25 @@ public class Database {
 	}
 
 	Database() {
+		Statement statement = null;
 		try {
 			Class.forName("org.sqlite.JDBC");
 			connection = DriverManager.getConnection("jdbc:sqlite:video.db");
-			Statement statement = connection.createStatement();
-			statement.executeUpdate("create table video(date, time, name, watch)");
-			statement.executeUpdate("create table watchtime(date,time, watchtime)");
+			statement = connection.createStatement();
+			statement.executeUpdate("create table if not exists video(date, time, name, watch)");
+			statement.executeUpdate("create table if not exists watchtime(date,time, watchtime)");
 		} catch (SQLException e) {
-
+			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (statement != null) {
+					statement.close();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -65,15 +75,61 @@ public class Database {
 	void putVideo(String video) {
 		if (video.indexOf(".MP4") < 0)
 			return;
-		Statement statement = null;
-		try {
-			statement = connection.createStatement();
-			ResultSet rs = statement.executeQuery("select * from video where name=\"" + video + "\"");
+		PreparedStatement ps = null;
+		try {			
+			ps = connection.prepareStatement("select * from video where name=?");
+			ps.setString(1, video);
+			ResultSet rs = ps.executeQuery();
 			while (rs.next()) {
 				// System.out.println("DUPLICATED:"+rs.getString(1)+rs.getString(2));
 				return;
 			}
-			statement.executeUpdate("insert into video values(date('now'),time('now'),\"" + video + "\",0)");
+			ps = connection.prepareStatement("insert into video values(date('now'),time('now'),?,0)");
+			ps.setString(1, video);
+			ps.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	void setVideo(String video, int watch) {
+		PreparedStatement ps = null;
+		try {
+			ps = connection.prepareStatement("update video set watch=? where name=?");
+			ps.setInt(1, watch);
+			ps.setString(2, video);
+			ps.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	int getWatchTime() {
+		Statement statement = null;
+		int time = 0;
+		try {
+			statement = connection.createStatement();
+			ResultSet rs = statement.executeQuery("select sum(watchtime) from watchtime");
+			while (rs.next()) {
+				// System.out.println("DUPLICATED:"+rs.getString(1)+rs.getString(2));				
+				time = rs.getInt(1);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -85,41 +141,25 @@ public class Database {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	void setVideo(String video, int watch) {
-		try {
-			Statement statement = connection.createStatement();
-			statement.executeUpdate("delete from video where name=\"" + video + "\"");
-			statement
-					.executeUpdate("insert into video values(date('now'),time('now'),\"" + video + "\"," + watch + ")");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	int getWatchTime() {
-		try {
-			Statement statement = connection.createStatement();
-			ResultSet rs = statement.executeQuery("select sum(watchtime) from watchtime");
-			while (rs.next()) {
-				// System.out.println("DUPLICATED:"+rs.getString(1)+rs.getString(2));
-				return rs.getInt(1);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return 0;
+		return time;
 	}
 
 	void putWatchTime(int watchtime) {
+		PreparedStatement ps = null;
 		try {
-			Statement statement = connection.createStatement();
-			// System.out.println("insert into watchtime
-			// values(date('now'),time('now')," + watchtime + ")");
-			statement.executeUpdate("insert into watchtime values(date('now'),time('now')," + watchtime + ")");
+			ps = connection.prepareStatement("insert into watchtime values(date('now'),time('now'),?)");
+			ps.setInt(1, watchtime);
+			ps.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -135,7 +175,7 @@ public class Database {
 				v.name = rs.getString(3);
 				v.watch = rs.getInt(4);
 				video.add(v);
-				//System.out.println(rs.getString(3)+rs.getInt(4));
+				// System.out.println(rs.getString(3)+rs.getInt(4));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -150,5 +190,4 @@ public class Database {
 		}
 		return video;
 	}
-
 }
