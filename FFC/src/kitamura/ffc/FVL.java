@@ -2,8 +2,9 @@ package kitamura.ffc;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
-
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -15,9 +16,14 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
-public class FVL extends JFrame implements TreeSelectionListener {
+public class FVL extends JFrame implements TreeSelectionListener, WindowListener {
 
-	static String version = "0.2";
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	static String version = "1.0";
 
 	Database db;
 	DefaultMutableTreeNode root;
@@ -114,7 +120,9 @@ public class FVL extends JFrame implements TreeSelectionListener {
 			if (v.get(i).watch == 1)
 				count++;
 		}
-		jl.setText("" + v.size() + "本中" + count + "本見ました！");
+		int watchtime = db.getWatchTime();
+		
+		jl.setText(watchtime+"秒で" + v.size() + "本中" + count + "本見ました！");
 
 	}
 
@@ -138,7 +146,8 @@ public class FVL extends JFrame implements TreeSelectionListener {
 			Process process = pb.start();
 			process.waitFor();
 			long end = System.currentTimeMillis();
-			System.out.println((end - start)/1000  + "秒");
+			//System.out.println((end - start)/1000  + "秒");
+			db.putWatchTime((int)(end - start)/1000);
 
 			checkVideo(node0);
 
@@ -175,6 +184,32 @@ public class FVL extends JFrame implements TreeSelectionListener {
 			checkVideo(child);
 		}
 		return;
+		
+		
+
+	}
+	
+	public void windowClosing(WindowEvent e) {
+		//System.out.println("BYE");
+		//db.getVideo();
+		db.close();
+	}
+	public void windowClosed(WindowEvent e) {
+	}
+
+	public void windowOpened(WindowEvent e) {
+	}
+
+	public void windowIconified(WindowEvent e) {
+	}
+
+	public void windowDeiconified(WindowEvent e) {
+	}
+
+	public void windowActivated(WindowEvent e) {
+	}
+
+	public void windowDeactivated(WindowEvent e) {
 	}
 
 }

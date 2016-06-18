@@ -2,6 +2,7 @@ package kitamura.ffc;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.BufferedReader;
@@ -11,6 +12,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.StringTokenizer;
 import java.util.logging.FileHandler;
@@ -41,7 +43,7 @@ public class FFC2 extends JFrame implements WindowListener {
 
 	private static final long serialVersionUID = 1L;
 
-	static String version = "0.1";
+	static String version = "1.0";
 	final String logfile = "FFC.log";
 	private Logger logger = null;
 
@@ -80,21 +82,26 @@ public class FFC2 extends JFrame implements WindowListener {
 
 		// フレームの初期化
 		setTitle(title);
-		setBounds(100, 100, 600, 100);
+		setBounds(100, 100, 600, 150);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		addWindowListener(this);
 		setVisible(true);
 
 		JPanel p = new JPanel();
-		JLabel label1 = new JLabel("Status: ");
+		JLabel label1 = new JLabel();
+		label1.setPreferredSize(new Dimension(500, 20));
 		label2 = new JLabel();
+		label2.setPreferredSize(new Dimension(500, 20));
 		label3 = new JLabel();
+		label3.setPreferredSize(new Dimension(500, 20));
 		p.add(label1);
 		p.add(label2);
 		p.add(label3);
 
 		Container contentPane = getContentPane();
 		contentPane.add(p, BorderLayout.CENTER);
+		
+
 
 		// フォルダ情報の初期化
 		for (int i = 0; i < folder.length; i++) {
@@ -104,6 +111,7 @@ public class FFC2 extends JFrame implements WindowListener {
 
 		// データベースの初期化
 		db = new Database();
+		showStatus();
 		// 設定ファイルの読込
 		setting();
 
@@ -124,7 +132,7 @@ public class FFC2 extends JFrame implements WindowListener {
 		// システムファイルのコピー
 		copyTransfer(home + "\\SYSTEM", ".\\");
 
-		label2.setText("END");
+		label2.setText("COMPLETED");
 	}
 
 	void setting() {
@@ -240,13 +248,26 @@ public class FFC2 extends JFrame implements WindowListener {
 				label3.setText(ex.toString());
 				;
 			}
-			label2.setText(src.getAbsolutePath().toString());
+			label2.setText("COPYING:"+src.getAbsolutePath().toString());
 		}
+	}
+	
+	void showStatus() {
+		ArrayList<Video> v = db.getVideo();
+		int count = 0;
+		for (int i = 0; i < v.size(); i++) {
+			if (v.get(i).watch == 1)
+				count++;
+		}
+		int watchtime = db.getWatchTime();
+		
+		label3.setText("これまで"+watchtime+"秒で" + v.size() + "本中" + count + "本見ています！");
+
 	}
 
 	public void windowClosing(WindowEvent e) {
 		//System.out.println("BYE");
-		db.getVideo();
+		//db.getVideo();
 		db.close();
 		
 		try {

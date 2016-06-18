@@ -13,7 +13,6 @@ public class Database {
 	public static void main(String[] args) {
 		Database db = new Database();
 		db.initialize();
-		//db.putVideo("abc");
 		db.getVideo();
 		db.close();
 	}
@@ -23,20 +22,23 @@ public class Database {
 			Class.forName("org.sqlite.JDBC");
 			connection = DriverManager.getConnection("jdbc:sqlite:video.db");
 			Statement statement = connection.createStatement();
-			statement.executeUpdate("create table video(name, watch)");
+			statement.executeUpdate("create table video(date, time, name, watch)");
+			statement.executeUpdate("create table watchtime(date,time, watchtime)");
 		} catch (SQLException e) {
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
-	void initialize(){
+
+	void initialize() {
 		Statement statement = null;
 		try {
 			statement = connection.createStatement();
 			statement.executeUpdate("drop table if exists video");
-			statement.executeUpdate("create table video(name, watch)");
+			statement.executeUpdate("create table video(date, time, name, watch)");
+			statement.executeUpdate("drop table if exists watchtime");
+			statement.executeUpdate("create table watchtime(date,time, watchtime)");
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -61,17 +63,17 @@ public class Database {
 	}
 
 	void putVideo(String video) {
+		if (video.indexOf(".MP4") < 0)
+			return;
 		Statement statement = null;
-		
 		try {
 			statement = connection.createStatement();
-			ResultSet rs = statement.executeQuery("select * from video where name=\""+video+"\"");
+			ResultSet rs = statement.executeQuery("select * from video where name=\"" + video + "\"");
 			while (rs.next()) {
-				//System.out.println("DUPLICATED:"+rs.getString(1)+rs.getString(2));
+				// System.out.println("DUPLICATED:"+rs.getString(1)+rs.getString(2));
 				return;
 			}
-			
-			statement.executeUpdate("insert into video values(\"" + video + "\",0)");
+			statement.executeUpdate("insert into video values(date('now'),time('now'),\"" + video + "\",0)");
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -84,14 +86,39 @@ public class Database {
 			}
 		}
 	}
-	
-	void setVideo(String video, int watch){
-		try{
+
+	void setVideo(String video, int watch) {
+		try {
 			Statement statement = connection.createStatement();
-			statement.executeUpdate("delete from video where name=\""+video+"\"");
-			statement.executeUpdate("insert into video values(\"" + video + "\","+watch+")");
+			statement.executeUpdate("delete from video where name=\"" + video + "\"");
+			statement
+					.executeUpdate("insert into video values(date('now'),time('now'),\"" + video + "\"," + watch + ")");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		catch(Exception e){
+	}
+
+	int getWatchTime() {
+		try {
+			Statement statement = connection.createStatement();
+			ResultSet rs = statement.executeQuery("select sum(watchtime) from watchtime");
+			while (rs.next()) {
+				// System.out.println("DUPLICATED:"+rs.getString(1)+rs.getString(2));
+				return rs.getInt(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	void putWatchTime(int watchtime) {
+		try {
+			Statement statement = connection.createStatement();
+			// System.out.println("insert into watchtime
+			// values(date('now'),time('now')," + watchtime + ")");
+			statement.executeUpdate("insert into watchtime values(date('now'),time('now')," + watchtime + ")");
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -105,10 +132,10 @@ public class Database {
 			ResultSet rs = statement.executeQuery(sql);
 			while (rs.next()) {
 				Video v = new Video();
-				v.name = rs.getString(1);
-				v.watch = rs.getInt(2);
+				v.name = rs.getString(3);
+				v.watch = rs.getInt(4);
 				video.add(v);
-				//System.out.println(rs.getString(1)+rs.getString(2));
+				//System.out.println(rs.getString(3)+rs.getInt(4));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
