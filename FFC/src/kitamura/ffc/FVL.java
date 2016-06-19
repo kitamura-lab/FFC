@@ -29,7 +29,7 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 	DefaultMutableTreeNode root;
 	DefaultTreeModel model;
 	JTree tree;
-	JLabel jl;
+	JLabel label;
 
 	public static void main(String[] args) {
 		new FVL("FVL " + "ver." + version);
@@ -39,6 +39,7 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(10, 10, 600, 600);
 		setTitle(title);
+		setVisible(true);
 
 		root = new DefaultMutableTreeNode("Fighters");
 		tree = new JTree(root);
@@ -49,28 +50,24 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 		scrollPane.getViewport().setView(tree);
 		scrollPane.setPreferredSize(new Dimension(500, 500));
 
-		JPanel p = new JPanel();
-		jl = new JLabel("");
-		jl.setPreferredSize(new Dimension(500, 20));
-		p.add(jl, BorderLayout.NORTH);
-		p.add(scrollPane, BorderLayout.CENTER);
-
-		getContentPane().add(p);
+		JPanel panel = new JPanel();
+		label = new JLabel("");
+		label.setPreferredSize(new Dimension(500, 20));
+		panel.add(label, BorderLayout.NORTH);
+		panel.add(scrollPane, BorderLayout.CENTER);
+		getContentPane().add(panel);
 
 		db = new Database();
 
 		addVideo();
-
-		showStatus();
-
-		setVisible(true);
-		
 		tree.expandRow(0);
-		int row = tree.getRowCount()-1;
+		int row = tree.getRowCount() - 1;
 		while (row < tree.getRowCount()) {
 			tree.expandRow(row);
 			row++;
 		}
+
+		showStatus();
 	}
 
 	void addVideo() {
@@ -121,14 +118,14 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 				count++;
 		}
 		int watchtime = db.getWatchTime();
-		
-		jl.setText(watchtime+"秒で" + v.size() + "本中" + count + "本見ました！");
 
+		label.setText(watchtime + "秒で" + v.size() + "本中" + count + "本見ました！");
 	}
 
 	public void valueChanged(TreeSelectionEvent e) {
 		try {
 			TreePath path = tree.getSelectionPath();
+			if(path==null) return;
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
 			DefaultMutableTreeNode node0 = node;
 			String headerfile = node.toString();
@@ -139,43 +136,43 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 				node = (DefaultMutableTreeNode) node.getParent();
 			}
 			file = ".\\" + file;
-			//System.out.println(file);
+			// System.out.println(file);
 
 			long start = System.currentTimeMillis();
 			ProcessBuilder pb = new ProcessBuilder("C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe", file);
 			Process process = pb.start();
 			process.waitFor();
 			long end = System.currentTimeMillis();
-			//System.out.println((end - start)/1000  + "秒");
-			db.putWatchTime((int)(end - start)/1000);
+			// System.out.println((end - start)/1000 + "秒");
+			db.putWatchTime((int) (end - start) / 1000);
 
 			checkVideo(node0);
 
 			tree.clearSelection();
 		} catch (Exception ex) {
-			// ex.printStackTrace();
+			ex.printStackTrace();
 		}
 	}
 
 	void checkVideo(DefaultMutableTreeNode node) {
-		//System.out.println(node.toString() + node.getChildCount());
+		// System.out.println(node.toString() + node.getChildCount());
 		if (node.getChildCount() == 0) {
 
 			String file = "[済]" + node.toString().substring(3);
-			//System.out.println(node.toString() + ":" + file);
+			// System.out.println(node.toString() + ":" + file);
 			node.setUserObject(new DefaultMutableTreeNode(file));
 			model.nodeChanged(node);
-			
-			file=node.toString().substring(3);
+
+			file = node.toString().substring(3);
 			while (node.getParent() != null) {
 				file = node.getParent().toString() + "\\" + file;
 				node = (DefaultMutableTreeNode) node.getParent();
 			}
 			file = ".\\" + file;
-			//System.out.println("DB:"+file);
-			db.setVideo(file,1);
+			// System.out.println("DB:"+file);
+			db.setVideo(file, 1);
 			showStatus();
-			
+
 			return;
 		}
 
@@ -183,17 +180,12 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 			DefaultMutableTreeNode child = (DefaultMutableTreeNode) node.getChildAt(i);
 			checkVideo(child);
 		}
-		return;
-		
-		
-
 	}
-	
+
 	public void windowClosing(WindowEvent e) {
-		//System.out.println("BYE");
-		//db.getVideo();
 		db.close();
 	}
+
 	public void windowClosed(WindowEvent e) {
 	}
 
@@ -211,5 +203,4 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 
 	public void windowDeactivated(WindowEvent e) {
 	}
-
 }
