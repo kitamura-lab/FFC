@@ -4,7 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,7 +28,9 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 	 */
 	private static final long serialVersionUID = 1L;
 
-	static String version = "1.1";
+	static String version = "1.2";
+	final String logfile = "FVL.log";
+	private Logger logger = null;
 
 	Database db;
 	DefaultMutableTreeNode root;
@@ -36,6 +43,17 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 	}
 
 	FVL(String title) {
+		logger = Logger.getLogger(this.getClass().getName());
+		try {
+			FileHandler fh = new FileHandler(logfile);
+			fh.setFormatter(new java.util.logging.SimpleFormatter());
+			logger.addHandler(fh);
+		} catch (IOException e) {
+			e.printStackTrace();
+			// logger.log(Level.SEVERE, "ERROR:", e);
+		}
+		logger.setLevel(Level.CONFIG);
+
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(10, 10, 600, 600);
 		setTitle(title);
@@ -124,28 +142,44 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 
 	public void valueChanged(TreeSelectionEvent e) {
 		try {
+			String os = System.getProperty("os.name").toLowerCase();
+			String delimiter = "";
+			if (os.startsWith("windows"))
+				delimiter = "\\";
+			if (os.startsWith("mac"))
+				delimiter = "/";
+
 			TreePath path = tree.getSelectionPath();
-			if(path==null) return;
+			if (path == null)
+				return;
 			DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
 			DefaultMutableTreeNode node0 = node;
 			String headerfile = node.toString();
 			String file = headerfile.substring(headerfile.indexOf("]") + 1);
 			// System.out.println(file);
 			while (node.getParent() != null) {
-				file = node.getParent().toString() + "\\" + file;
+				file = node.getParent().toString() + delimiter + file;
 				node = (DefaultMutableTreeNode) node.getParent();
 			}
-			file = ".\\" + file;
+			file = "." + delimiter + file;
 			// System.out.println(file);
 
-			String os = System.getProperty("os.name").toLowerCase();
-			//System.out.println(os);
-			String vlcPath="";
-			if(os.startsWith("windows")) vlcPath="C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe";
-			if(os.startsWith("mac")) vlcPath="open /Applications/VLC.app";
-			
+			// System.out.println(os);
+			String vlcPath = "";
+			if (os.startsWith("windows"))
+				vlcPath = "C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe";
+			if (os.startsWith("mac"))
+				vlcPath = "/Applications/VLC.app";
+
 			long start = System.currentTimeMillis();
-			ProcessBuilder pb = new ProcessBuilder(vlcPath, file);
+			
+			ProcessBuilder pb=null;
+			//logger.log(Level.INFO,vlcPath+" "+file);
+			if (os.startsWith("windows"))
+				pb = new ProcessBuilder(vlcPath, file);
+			if (os.startsWith("mac")){
+				pb = new ProcessBuilder("open", "-a", vlcPath, file);
+			}
 			Process process = pb.start();
 			process.waitFor();
 			long end = System.currentTimeMillis();
@@ -157,6 +191,7 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 			tree.clearSelection();
 		} catch (Exception ex) {
 			ex.printStackTrace();
+			logger.log(Level.SEVERE, "ERROR:", ex);
 		}
 	}
 
