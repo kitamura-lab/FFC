@@ -138,8 +138,14 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 			file = ".\\" + file;
 			// System.out.println(file);
 
+			String os = System.getProperty("os.name").toLowerCase();
+			//System.out.println(os);
+			String vlcPath="";
+			if(os.startsWith("windows")) vlcPath="C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe";
+			if(os.startsWith("mac")) vlcPath="open /Applications/VLC.app";
+			
 			long start = System.currentTimeMillis();
-			ProcessBuilder pb = new ProcessBuilder("C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe", file);
+			ProcessBuilder pb = new ProcessBuilder(vlcPath, file);
 			Process process = pb.start();
 			process.waitFor();
 			long end = System.currentTimeMillis();
