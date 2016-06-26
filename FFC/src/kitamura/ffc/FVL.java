@@ -28,7 +28,7 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 	 */
 	private static final long serialVersionUID = 1L;
 
-	static String version = "1.2";
+	static String version = "1.3";
 	final String logfile = "FVL.log";
 	private Logger logger = null;
 
@@ -81,10 +81,14 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 		tree.expandRow(0);
 		int row = tree.getRowCount() - 1;
 		while (row < tree.getRowCount()) {
+			TreePath tp = tree.getPathForRow(row);
+			if (tp.getLastPathComponent().toString().indexOf("MP4") > 0) {
+				tree.collapseRow(row - 1);
+			}
+			//System.out.println(tp);
 			tree.expandRow(row);
 			row++;
 		}
-
 		showStatus();
 	}
 
@@ -172,12 +176,12 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 				vlcPath = "/Applications/VLC.app";
 
 			long start = System.currentTimeMillis();
-			
-			ProcessBuilder pb=null;
-			//logger.log(Level.INFO,vlcPath+" "+file);
+
+			ProcessBuilder pb = null;
+			// logger.log(Level.INFO,vlcPath+" "+file);
 			if (os.startsWith("windows"))
 				pb = new ProcessBuilder(vlcPath, file);
-			if (os.startsWith("mac")){
+			if (os.startsWith("mac")) {
 				pb = new ProcessBuilder("open", "-a", vlcPath, file);
 			}
 			Process process = pb.start();
