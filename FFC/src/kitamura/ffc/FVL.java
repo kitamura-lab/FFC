@@ -141,7 +141,8 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 		}
 		int watchtime = db.getWatchTime();
 
-		label.setText(watchtime + "秒で" + v.size() + "本中" + count + "本見ました！");
+		//label.setText(watchtime + "秒で" + v.size() + "本中" + count + "本見ました！");
+		label.setText(watchtime + " 秒／週");
 	}
 
 	public void valueChanged(TreeSelectionEvent e) {

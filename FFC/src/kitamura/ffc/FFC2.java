@@ -261,7 +261,7 @@ public class FFC2 extends JFrame implements WindowListener {
 		}
 		int watchtime = db.getWatchTime();
 		
-		label3.setText("これまで"+watchtime+"秒で" + v.size() + "本中" + count + "本見ています！");
+		label3.setText(watchtime+" 秒／週");
 
 	}
 

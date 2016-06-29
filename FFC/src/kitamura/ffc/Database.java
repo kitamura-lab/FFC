@@ -125,9 +125,9 @@ public class Database {
 		int time = 0;
 		try {
 			statement = connection.createStatement();
-			ResultSet rs = statement.executeQuery("select sum(watchtime) from watchtime");
+			ResultSet rs = statement.executeQuery("select sum(watchtime) from watchtime where date >= date('now', '-7 days')");
 			while (rs.next()) {
-				// System.out.println("DUPLICATED:"+rs.getString(1)+rs.getString(2));				
+				//System.out.println("TIME:"+rs.getString(1));				
 				time = rs.getInt(1);
 			}
 		} catch (Exception e) {
