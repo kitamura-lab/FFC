@@ -28,7 +28,7 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 	 */
 	private static final long serialVersionUID = 1L;
 
-	static String version = "1.3";
+	static String version = "1.4";
 	final String logfile = "FVL.log";
 	private Logger logger = null;
 
