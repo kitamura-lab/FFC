@@ -142,7 +142,7 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 		int watchtime = db.getWatchTime();
 
 		//label.setText(watchtime + "秒で" + v.size() + "本中" + count + "本見ました！");
-		label.setText(watchtime + " 秒／週");
+		label.setText("この1週間の視聴時間： "+watchtime+" 秒");
 	}
 
 	public void valueChanged(TreeSelectionEvent e) {
@@ -186,6 +186,7 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 				pb = new ProcessBuilder("open", "-a", vlcPath, file);
 			}
 			Process process = pb.start();
+			//System.out.println(file);
 			process.waitFor();
 			long end = System.currentTimeMillis();
 			// System.out.println((end - start)/1000 + "秒");
