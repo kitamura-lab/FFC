@@ -73,10 +73,12 @@ public class Database {
 	}
 
 	void putVideo(String video) {
-		if (video.indexOf(".MP4") < 0)
+		if (video.indexOf(".MP4") < 0 && video.indexOf(".mp4") < 0 && video.indexOf(".MOV") < 0
+				&& video.indexOf(".mov") < 0 && video.indexOf(".JPG") < 0 && video.indexOf(".jpg") < 0
+				&& video.indexOf(".MOD") < 0 && video.indexOf(".mod") < 0)
 			return;
 		PreparedStatement ps = null;
-		try {			
+		try {
 			ps = connection.prepareStatement("select * from video where name=?");
 			ps.setString(1, video);
 			ResultSet rs = ps.executeQuery();
@@ -125,9 +127,10 @@ public class Database {
 		int time = 0;
 		try {
 			statement = connection.createStatement();
-			ResultSet rs = statement.executeQuery("select sum(watchtime) from watchtime where date >= date('now', '-7 days')");
+			ResultSet rs = statement
+					.executeQuery("select sum(watchtime) from watchtime where date >= date('now', '-7 days')");
 			while (rs.next()) {
-				//System.out.println("TIME:"+rs.getString(1));				
+				// System.out.println("TIME:"+rs.getString(1));
 				time = rs.getInt(1);
 			}
 		} catch (Exception e) {

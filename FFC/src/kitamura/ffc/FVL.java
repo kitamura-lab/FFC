@@ -28,7 +28,7 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 	 */
 	private static final long serialVersionUID = 1L;
 
-	static String version = "1.4";
+	static String version = "1.5";
 	final String logfile = "FVL.log";
 	private Logger logger = null;
 
@@ -82,10 +82,17 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 		int row = tree.getRowCount() - 1;
 		while (row < tree.getRowCount()) {
 			TreePath tp = tree.getPathForRow(row);
-			if (tp.getLastPathComponent().toString().indexOf("MP4") > 0) {
+			if (tp.getLastPathComponent().toString().indexOf(".MP4") > 0
+					|| tp.getLastPathComponent().toString().indexOf(".mp4") > 0
+					|| tp.getLastPathComponent().toString().indexOf(".MOV") > 0
+					|| tp.getLastPathComponent().toString().indexOf(".mov") > 0
+					|| tp.getLastPathComponent().toString().indexOf(".JPG") > 0
+					|| tp.getLastPathComponent().toString().indexOf(".jpg") > 0
+					|| tp.getLastPathComponent().toString().indexOf(".MOD") > 0
+					|| tp.getLastPathComponent().toString().indexOf(".mod") > 0) {
 				tree.collapseRow(row - 1);
 			}
-			//System.out.println(tp);
+			// System.out.println(tp);
 			tree.expandRow(row);
 			row++;
 		}
@@ -141,8 +148,8 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 		}
 		int watchtime = db.getWatchTime();
 
-		//label.setText(watchtime + "秒で" + v.size() + "本中" + count + "本見ました！");
-		label.setText("この1週間の視聴時間： "+watchtime+" 秒");
+		// label.setText(watchtime + "秒で" + v.size() + "本中" + count + "本見ました！");
+		label.setText("この1週間の視聴時間： " + watchtime + " 秒");
 	}
 
 	public void valueChanged(TreeSelectionEvent e) {
@@ -186,7 +193,7 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 				pb = new ProcessBuilder("open", "-a", vlcPath, file);
 			}
 			Process process = pb.start();
-			//System.out.println(file);
+			// System.out.println(file);
 			process.waitFor();
 			long end = System.currentTimeMillis();
 			// System.out.println((end - start)/1000 + "秒");
