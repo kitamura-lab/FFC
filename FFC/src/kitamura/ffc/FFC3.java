@@ -45,11 +45,11 @@ public class FFC3 extends JFrame implements WindowListener {
 
 	private static final long serialVersionUID = 1L;
 
-	static String version = "3.0";
+	static String version = "3.1";
 	final String logfile = "FFC.log";
 	private Logger logger = null;
 
-	JLabel label2, label3;
+	JLabel label1, label2, label3;
 	String practice = "C:\\Users\\kitamura\\Documents\\PRACTICE";
 	String game = "C:\\Users\\kitamura\\Documents\\GAME";
 	String system = "C:\\Users\\kitamura\\Documents\\SYSTEM";
@@ -93,7 +93,7 @@ public class FFC3 extends JFrame implements WindowListener {
 		setVisible(true);
 
 		JPanel p = new JPanel();
-		JLabel label1 = new JLabel();
+		label1 = new JLabel();
 		label1.setPreferredSize(new Dimension(500, 20));
 		label2 = new JLabel();
 		label2.setPreferredSize(new Dimension(500, 20));
@@ -131,7 +131,7 @@ public class FFC3 extends JFrame implements WindowListener {
 			if (folder[i].flag == 1)
 				copyTransfer(practice + "\\" + folder[i].name, dest + "\\" + monthday() + "\\" + folder[i].name);
 		}
-		
+
 		// 試合ビデオのコピー
 		for (int i = 0; i < folder.length; i++) {
 			if (folder[i].flag == 1)
@@ -159,7 +159,9 @@ public class FFC3 extends JFrame implements WindowListener {
 				// 区切り文字","で分割する
 				token = new StringTokenizer(line, ",");
 				String id = token.nextToken();
-				if (id.equals("PRACTICE")) {
+				if (id.equals("HOME")) {
+					label1.setText("FFC.Configのバージョンが古いです．");
+				} else if (id.equals("PRACTICE")) {
 					Pattern p = Pattern.compile("\\\\");
 					Matcher m = p.matcher(token.nextToken());
 					practice = m.replaceAll("\\\\\\\\");
