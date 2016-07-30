@@ -193,7 +193,7 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 				pb = new ProcessBuilder("open", "-a", vlcPath, file);
 			}
 			Process process = pb.start();
-			// System.out.println(file);
+			//System.out.println(file);
 			process.waitFor();
 			long end = System.currentTimeMillis();
 			// System.out.println((end - start)/1000 + "秒");

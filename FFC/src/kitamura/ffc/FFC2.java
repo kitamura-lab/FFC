@@ -56,7 +56,7 @@ public class FFC2 extends JFrame implements WindowListener {
 		int flag;
 	}
 
-	Folder folder[] = new Folder[100];
+	Folder folder[] = new Folder[100]; //ポジション別フォルダ
 	Database db;
 
 	/**
@@ -103,7 +103,7 @@ public class FFC2 extends JFrame implements WindowListener {
 		
 
 
-		// フォルダ情報の初期化
+		// ポジション別フォルダ情報の初期化
 		for (int i = 0; i < folder.length; i++) {
 			folder[i] = new Folder();
 			folder[i].flag = 0;

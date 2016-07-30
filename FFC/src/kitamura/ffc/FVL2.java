@@ -4,7 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -79,6 +83,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 
 		addVideo();
 		tree.expandRow(0);
+		/*
 		int row = tree.getRowCount() - 1;
 		while (row < tree.getRowCount()) {
 			TreePath tp = tree.getPathForRow(row);
@@ -96,11 +101,45 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 			tree.expandRow(row);
 			row++;
 		}
+		*/
 		showStatus();
 	}
 
+	ArrayList<Video> getVideo(File src, ArrayList<Video> vlist) {
+
+		// ArrayList<Video> vlist = new ArrayList<Video>();
+
+		if (src.isDirectory()) {
+			String[] files = src.list();
+			for (String file : files) {
+				File srcFile = new File(src, file);
+				getVideo(srcFile, vlist);
+			}
+		} else {
+
+			Video v = new Video();
+			try {
+				//v.name = src.getCanonicalPath().toString();
+				v.name = src.getPath().toString();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				logger.log(Level.SEVERE, "ERROR:", ex);
+			}
+			v.watch = 0;
+			if (v.name.indexOf(".MP4") < 0 && v.name.indexOf(".mp4") < 0 && v.name.indexOf(".MOV") < 0
+					&& v.name.indexOf(".mov") < 0 && v.name.indexOf(".JPG") < 0 && v.name.indexOf(".jpg") < 0
+					&& v.name.indexOf(".MOD") < 0 && v.name.indexOf(".mod") < 0)
+				return vlist;
+
+			vlist.add(v);
+			//System.out.println(v.name);
+		}
+
+		return vlist;
+	}
+
 	void addVideo() {
-		ArrayList<Video> v = db.getVideo();
+		ArrayList<Video> v = getVideo(new File(".\\"), new ArrayList<Video>());
 		for (int i = 0; i < v.size(); i++) {
 			String header = "";
 			if (v.get(i).watch == 0)
@@ -110,7 +149,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 			String path = v.get(i).name;
 			if (path.indexOf("\\") < 0)
 				continue;
-			path = path.substring(2);
+			//path = path.substring(2);
 			// System.out.println(path.substring(0,path.indexOf("\\")));
 			root.setUserObject(new DefaultMutableTreeNode(path.substring(0, path.indexOf("\\"))));
 			DefaultMutableTreeNode node = root;
@@ -173,7 +212,9 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 				file = node.getParent().toString() + delimiter + file;
 				node = (DefaultMutableTreeNode) node.getParent();
 			}
-			file = "." + delimiter + file;
+			//file = "." + delimiter + file;
+			//file = "C:"+delimiter + file;
+			//file = delimiter + file;
 			// System.out.println(file);
 
 			// System.out.println(os);
@@ -193,7 +234,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 				pb = new ProcessBuilder("open", "-a", vlcPath, file);
 			}
 			Process process = pb.start();
-			// System.out.println(file);
+			//System.out.println(file);
 			process.waitFor();
 			long end = System.currentTimeMillis();
 			// System.out.println((end - start)/1000 + "秒");
