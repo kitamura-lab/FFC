@@ -261,7 +261,7 @@ public class FFC3 extends JFrame implements WindowListener {
 				FileChannel destChannel = fos.getChannel();
 				srcChannel.transferTo(0, srcChannel.size(), destChannel);
 				// System.out.println(dest);
-				db.putVideo(dest.toString());
+				//db.putVideo(dest.toString());
 				srcChannel.close();
 				destChannel.close();
 				fis.close();
