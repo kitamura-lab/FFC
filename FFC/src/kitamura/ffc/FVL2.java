@@ -47,7 +47,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 	}
 
 	FVL2(String title) {
-		//System.out.println("Start");
+		// System.out.println("Start");
 		logger = Logger.getLogger(this.getClass().getName());
 		try {
 			FileHandler fh = new FileHandler(logfile);
@@ -105,8 +105,8 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 
 		// ArrayList<Video> vlist = new ArrayList<Video>();
 
-		//System.out.println(src);
-		
+		// System.out.println(src);
+
 		if (src.isDirectory()) {
 			String[] files = src.list();
 			for (String file : files) {
@@ -130,8 +130,9 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 				return vlist;
 
 			vlist.add(v);
-			//System.out.println(v.name);
-			//logger.log(Level.INFO, v.name);
+			db.putVideo(v.name);
+			// System.out.println(v.name);
+			// logger.log(Level.INFO, v.name);
 		}
 
 		return vlist;
@@ -143,17 +144,17 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 		String delimitter = null;
 		if (os.startsWith("windows")) {
 			v = getVideo(new File(".\\"), new ArrayList<Video>());
-			delimitter ="\\";
+			delimitter = "\\";
 		}
 		if (os.startsWith("mac")) {
 			v = getVideo(new File("./"), new ArrayList<Video>());
 			delimitter = "/";
 		}
-		//System.out.println("addVideo: "+v.size());
-		
+		// System.out.println("addVideo: "+v.size());
+
 		for (int i = 0; i < v.size(); i++) {
 			String header = "";
-			if (v.get(i).watch == 0)
+			if (db.checkVideo(v.get(i).name) == 0)
 				header = "[未]";
 			else
 				header = "[済]";
@@ -248,7 +249,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 			// System.out.println(file);
 			process.waitFor();
 			long end = System.currentTimeMillis();
-			//System.out.println(""+end+":"+start+":"+(end-start));
+			// System.out.println(""+end+":"+start+":"+(end-start));
 			db.putWatchTime((int) (end - start) / 1000);
 
 			checkVideo(node0);
@@ -274,7 +275,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 				file = node.getParent().toString() + "\\" + file;
 				node = (DefaultMutableTreeNode) node.getParent();
 			}
-			file = ".\\" + file;
+			// file = ".\\" + file;
 			// System.out.println("DB:"+file);
 			db.setVideo(file, 1);
 			showStatus();

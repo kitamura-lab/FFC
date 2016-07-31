@@ -121,7 +121,32 @@ public class Database {
 			}
 		}
 	}
+	
+	int checkVideo(String name){
+		PreparedStatement ps = null;
+		try {
+			ps = connection.prepareStatement("select watch from video where name=?");
+			ps.setString(1, name);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				// System.out.println("TIME:"+rs.getString(1));
+				return rs.getInt(1);
+			}
 
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (ps != null) {
+					ps.close();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return 0;
+	}
+	
 	int getWatchTime() {
 		Statement statement = null;
 		int time = 0;
