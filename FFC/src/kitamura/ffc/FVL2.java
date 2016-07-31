@@ -41,6 +41,9 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 	DefaultTreeModel model;
 	JTree tree;
 	JLabel label;
+	
+	String delimiter = null;
+	String os = System.getProperty("os.name").toLowerCase();
 
 	public static void main(String[] args) {
 		new FVL2("FVL " + "ver." + version);
@@ -58,6 +61,14 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 			// logger.log(Level.SEVERE, "ERROR:", e);
 		}
 		logger.setLevel(Level.CONFIG);
+		
+		//os = System.getProperty("os.name").toLowerCase();
+		if (os.startsWith("windows")) {
+			delimiter = "\\";
+		}
+		if (os.startsWith("mac")) {
+			delimiter = "/";
+		}
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(10, 10, 600, 600);
@@ -139,17 +150,8 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 	}
 
 	void addVideo() {
-		ArrayList<Video> v = null;
-		String os = System.getProperty("os.name").toLowerCase();
-		String delimitter = null;
-		if (os.startsWith("windows")) {
-			v = getVideo(new File(".\\"), new ArrayList<Video>());
-			delimitter = "\\";
-		}
-		if (os.startsWith("mac")) {
-			v = getVideo(new File("./"), new ArrayList<Video>());
-			delimitter = "/";
-		}
+		ArrayList<Video> v = getVideo(new File("."+delimiter), new ArrayList<Video>());
+
 		// System.out.println("addVideo: "+v.size());
 
 		for (int i = 0; i < v.size(); i++) {
@@ -159,15 +161,15 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 			else
 				header = "[済]";
 			String path = v.get(i).name;
-			if (path.indexOf(delimitter) < 0)
+			if (path.indexOf(delimiter) < 0)
 				continue;
 			// path = path.substring(2);
 			// System.out.println(path.substring(0,path.indexOf("\\")));
-			root.setUserObject(new DefaultMutableTreeNode(path.substring(0, path.indexOf(delimitter))));
+			root.setUserObject(new DefaultMutableTreeNode(path.substring(0, path.indexOf(delimiter))));
 			DefaultMutableTreeNode node = root;
-			path = path.substring(path.indexOf(delimitter) + 1);
-			while (path.indexOf(delimitter) > 0) {
-				String nodeName = path.substring(0, path.indexOf(delimitter));
+			path = path.substring(path.indexOf(delimiter) + 1);
+			while (path.indexOf(delimiter) > 0) {
+				String nodeName = path.substring(0, path.indexOf(delimiter));
 				// System.out.println(nodeName);
 				DefaultMutableTreeNode node1 = null;
 				for (int j = 0; j < node.getChildCount(); j++) {
@@ -182,7 +184,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 					node1 = new DefaultMutableTreeNode(nodeName);
 				node.add(node1);
 				node = node1;
-				path = path.substring(path.indexOf(delimitter) + 1);
+				path = path.substring(path.indexOf(delimiter) + 1);
 			}
 			// System.out.println(path);
 			node.add(new DefaultMutableTreeNode(header + path));
@@ -205,12 +207,6 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 
 	public void valueChanged(TreeSelectionEvent e) {
 		try {
-			String os = System.getProperty("os.name").toLowerCase();
-			String delimiter = "";
-			if (os.startsWith("windows"))
-				delimiter = "\\";
-			if (os.startsWith("mac"))
-				delimiter = "/";
 
 			TreePath path = tree.getSelectionPath();
 			if (path == null)
@@ -272,7 +268,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 
 			file = node.toString().substring(3);
 			while (node.getParent() != null) {
-				file = node.getParent().toString() + "\\" + file;
+				file = node.getParent().toString() + delimiter + file;
 				node = (DefaultMutableTreeNode) node.getParent();
 			}
 			// file = ".\\" + file;
