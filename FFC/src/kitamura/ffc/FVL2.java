@@ -130,8 +130,8 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 				return vlist;
 
 			vlist.add(v);
-			System.out.println(v.name);
-			logger.log(Level.INFO, v.name);
+			//System.out.println(v.name);
+			//logger.log(Level.INFO, v.name);
 		}
 
 		return vlist;
@@ -149,7 +149,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 			v = getVideo(new File("./"), new ArrayList<Video>());
 			delimitter = "/";
 		}
-		System.out.println("addVideo: "+v.size());
+		//System.out.println("addVideo: "+v.size());
 		
 		for (int i = 0; i < v.size(); i++) {
 			String header = "";
@@ -248,7 +248,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 			// System.out.println(file);
 			process.waitFor();
 			long end = System.currentTimeMillis();
-			System.out.println(""+end+":"+start+":"+(end-start));
+			//System.out.println(""+end+":"+start+":"+(end-start));
 			db.putWatchTime((int) (end - start) / 1000);
 
 			checkVideo(node0);
