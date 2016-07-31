@@ -47,6 +47,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 	}
 
 	FVL2(String title) {
+		//System.out.println("Start");
 		logger = Logger.getLogger(this.getClass().getName());
 		try {
 			FileHandler fh = new FileHandler(logfile);
@@ -104,6 +105,8 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 
 		// ArrayList<Video> vlist = new ArrayList<Video>();
 
+		//System.out.println(src);
+		
 		if (src.isDirectory()) {
 			String[] files = src.list();
 			for (String file : files) {
@@ -137,13 +140,17 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 	void addVideo() {
 		ArrayList<Video> v = null;
 		String os = System.getProperty("os.name").toLowerCase();
+		String delimitter = null;
 		if (os.startsWith("windows")) {
 			v = getVideo(new File(".\\"), new ArrayList<Video>());
+			delimitter ="\\";
 		}
 		if (os.startsWith("mac")) {
 			v = getVideo(new File("./"), new ArrayList<Video>());
-
+			delimitter = "/";
 		}
+		System.out.println("addVideo: "+v.size());
+		
 		for (int i = 0; i < v.size(); i++) {
 			String header = "";
 			if (v.get(i).watch == 0)
@@ -151,15 +158,15 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 			else
 				header = "[済]";
 			String path = v.get(i).name;
-			if (path.indexOf("\\") < 0)
+			if (path.indexOf(delimitter) < 0)
 				continue;
 			// path = path.substring(2);
 			// System.out.println(path.substring(0,path.indexOf("\\")));
-			root.setUserObject(new DefaultMutableTreeNode(path.substring(0, path.indexOf("\\"))));
+			root.setUserObject(new DefaultMutableTreeNode(path.substring(0, path.indexOf(delimitter))));
 			DefaultMutableTreeNode node = root;
-			path = path.substring(path.indexOf("\\") + 1);
-			while (path.indexOf("\\") > 0) {
-				String nodeName = path.substring(0, path.indexOf("\\"));
+			path = path.substring(path.indexOf(delimitter) + 1);
+			while (path.indexOf(delimitter) > 0) {
+				String nodeName = path.substring(0, path.indexOf(delimitter));
 				// System.out.println(nodeName);
 				DefaultMutableTreeNode node1 = null;
 				for (int j = 0; j < node.getChildCount(); j++) {
@@ -174,7 +181,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 					node1 = new DefaultMutableTreeNode(nodeName);
 				node.add(node1);
 				node = node1;
-				path = path.substring(path.indexOf("\\") + 1);
+				path = path.substring(path.indexOf(delimitter) + 1);
 			}
 			// System.out.println(path);
 			node.add(new DefaultMutableTreeNode(header + path));
@@ -235,13 +242,13 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 			if (os.startsWith("windows"))
 				pb = new ProcessBuilder(vlcPath, file);
 			if (os.startsWith("mac")) {
-				pb = new ProcessBuilder("open", "-a", vlcPath, file);
+				pb = new ProcessBuilder("open", "-W", "-a", vlcPath, file);
 			}
 			Process process = pb.start();
 			// System.out.println(file);
 			process.waitFor();
 			long end = System.currentTimeMillis();
-			// System.out.println((end - start)/1000 + "秒");
+			System.out.println(""+end+":"+start+":"+(end-start));
 			db.putWatchTime((int) (end - start) / 1000);
 
 			checkVideo(node0);
