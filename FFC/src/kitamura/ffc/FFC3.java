@@ -45,7 +45,7 @@ public class FFC3 extends JFrame implements WindowListener {
 
 	private static final long serialVersionUID = 1L;
 
-	static String version = "3.1";
+	static String version = "3.2";
 	final String logfile = "FFC.log";
 	private Logger logger = null;
 
