@@ -32,7 +32,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 	 */
 	private static final long serialVersionUID = 1L;
 
-	static String version = "2.2";
+	static String version = "2.3";
 	final String logfile = "FVL.log";
 	private Logger logger = null;
 
@@ -141,7 +141,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 				return vlist;
 
 			vlist.add(v);
-			db.putVideo(v.name);
+			//db.putVideo(v.name);
 			// System.out.println(v.name);
 			// logger.log(Level.INFO, v.name);
 		}
@@ -156,10 +156,12 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 
 		for (int i = 0; i < v.size(); i++) {
 			String header = "";
+			/*
 			if (db.checkVideo(v.get(i).name) == 0)
 				header = "[未]";
 			else
 				header = "[済]";
+			*/
 			String path = v.get(i).name;
 			if (path.indexOf(delimiter) < 0)
 				continue;
@@ -193,12 +195,14 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 	}
 
 	void showStatus() {
+		/*
 		ArrayList<Video> v = db.getVideo();
 		int count = 0;
 		for (int i = 0; i < v.size(); i++) {
 			if (v.get(i).watch == 1)
 				count++;
 		}
+		*/
 		int watchtime = db.getWatchTime();
 
 		// label.setText(watchtime + "秒で" + v.size() + "本中" + count + "本見ました！");
@@ -215,7 +219,8 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 			DefaultMutableTreeNode node0 = node;
 			String headerfile = node.toString();
 			String file = headerfile.substring(headerfile.indexOf("]") + 1);
-			// System.out.println(file);
+			//file = headerfile;
+			//System.out.println(file);
 			while (node.getParent() != null) {
 				file = node.getParent().toString() + delimiter + file;
 				node = (DefaultMutableTreeNode) node.getParent();
@@ -260,20 +265,23 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 	void checkVideo(DefaultMutableTreeNode node) {
 		// System.out.println(node.toString() + node.getChildCount());
 		if (node.getChildCount() == 0) {
-
-			String file = "[済]" + node.toString().substring(3);
-			// System.out.println(node.toString() + ":" + file);
+			/*
+			String header = "[済]";
+			header = "";
+			String file = header + node.toString().substring(3);
+			*/
+			String file = node.toString();
 			node.setUserObject(new DefaultMutableTreeNode(file));
 			model.nodeChanged(node);
 
-			file = node.toString().substring(3);
+			//file = node.toString().substring(3);
 			while (node.getParent() != null) {
 				file = node.getParent().toString() + delimiter + file;
 				node = (DefaultMutableTreeNode) node.getParent();
 			}
 			// file = ".\\" + file;
 			// System.out.println("DB:"+file);
-			db.setVideo(file, 1);
+			//db.setVideo(file, 1);
 			showStatus();
 
 			return;
