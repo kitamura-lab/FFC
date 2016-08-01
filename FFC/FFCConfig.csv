@@ -1,5 +1,5 @@
-PRACTICE,C:\Users\kitamura\Documents\FIGHTERS
-DEST,FIGHTERS2
+PRACTICE,C:\Users\Public\PRACTICE
+DEST,PRACTICE
 DB,1
 DL,1
 HB,0
@@ -9,3 +9,6 @@ QB,1
 SB,0
 TE,0
 WR,0
+Team,1
+GAME,C:\Users\Public\GAME
+SYSTEM,C:\Users\Public\SYSTEM

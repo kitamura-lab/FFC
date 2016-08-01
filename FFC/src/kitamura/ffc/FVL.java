@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -28,7 +29,7 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 	 */
 	private static final long serialVersionUID = 1L;
 
-	static String version = "1.5";
+	static String version = "1.6";
 	final String logfile = "FVL.log";
 	private Logger logger = null;
 
@@ -194,6 +195,19 @@ public class FVL extends JFrame implements TreeSelectionListener, WindowListener
 			}
 			Process process = pb.start();
 			//System.out.println(file);
+			
+			InputStream is = process.getErrorStream();
+			try {
+				while (is.read() >= 0){
+					//printInputStream(is); // 標準出力だけ読み込めばよい
+					//System.out.println("AAA");
+				}
+			} finally {
+				is.close();
+			}
+
+			
+			
 			process.waitFor();
 			long end = System.currentTimeMillis();
 			// System.out.println((end - start)/1000 + "秒");
