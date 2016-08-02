@@ -35,7 +35,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 	 */
 	private static final long serialVersionUID = 1L;
 
-	static String version = "2.3a";
+	static String version = "2.4";
 	final String logfile = "FVL.log";
 	private Logger logger = null;
 
@@ -47,6 +47,7 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 
 	String delimiter = null;
 	String os = System.getProperty("os.name").toLowerCase();
+	String vlcPath = null;
 
 	public static void main(String[] args) {
 		new FVL2("FVL " + "ver." + version);
@@ -66,12 +67,6 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 		logger.setLevel(Level.CONFIG);
 
 		// os = System.getProperty("os.name").toLowerCase();
-		if (os.startsWith("windows")) {
-			delimiter = "\\";
-		}
-		if (os.startsWith("mac")) {
-			delimiter = "/";
-		}
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(10, 10, 600, 600);
@@ -94,25 +89,75 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 		panel.add(scrollPane, BorderLayout.CENTER);
 		getContentPane().add(panel);
 
+		if (os.startsWith("windows")) {
+			delimiter = "\\";
+			File vlc = new File("C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe");
+			if (vlc.exists())
+				vlcPath = "C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe";
+
+			if (vlcPath == null) {
+				label.setText("VLCを探しています．");
+				vlcPath = findVlc(new File("C:\\"));
+				if (vlcPath != null)
+					logger.log(Level.INFO, vlcPath);
+			}
+
+			// vlcPath = findVlc(new File("C:\\"));
+			if (vlcPath == null) {
+				label.setText("VLCがインストールされていません．");
+
+			}
+		}
+		if (os.startsWith("mac")) {
+			delimiter = "/";
+			vlcPath = "/Applications/VLC.app";
+		}
+
 		db = new Database();
 
-		addVideo();
-		tree.expandRow(0);
-		/*
-		 * int row = tree.getRowCount() - 1; while (row < tree.getRowCount()) {
-		 * TreePath tp = tree.getPathForRow(row); if
-		 * (tp.getLastPathComponent().toString().indexOf(".MP4") > 0 ||
-		 * tp.getLastPathComponent().toString().indexOf(".mp4") > 0 ||
-		 * tp.getLastPathComponent().toString().indexOf(".MOV") > 0 ||
-		 * tp.getLastPathComponent().toString().indexOf(".mov") > 0 ||
-		 * tp.getLastPathComponent().toString().indexOf(".JPG") > 0 ||
-		 * tp.getLastPathComponent().toString().indexOf(".jpg") > 0 ||
-		 * tp.getLastPathComponent().toString().indexOf(".MOD") > 0 ||
-		 * tp.getLastPathComponent().toString().indexOf(".mod") > 0) {
-		 * tree.collapseRow(row - 1); } // System.out.println(tp);
-		 * tree.expandRow(row); row++; }
-		 */
-		showStatus();
+		if (vlcPath != null) {
+			addVideo();
+			tree.expandRow(0);
+			/*
+			 * int row = tree.getRowCount() - 1; while (row <
+			 * tree.getRowCount()) { TreePath tp = tree.getPathForRow(row); if
+			 * (tp.getLastPathComponent().toString().indexOf(".MP4") > 0 ||
+			 * tp.getLastPathComponent().toString().indexOf(".mp4") > 0 ||
+			 * tp.getLastPathComponent().toString().indexOf(".MOV") > 0 ||
+			 * tp.getLastPathComponent().toString().indexOf(".mov") > 0 ||
+			 * tp.getLastPathComponent().toString().indexOf(".JPG") > 0 ||
+			 * tp.getLastPathComponent().toString().indexOf(".jpg") > 0 ||
+			 * tp.getLastPathComponent().toString().indexOf(".MOD") > 0 ||
+			 * tp.getLastPathComponent().toString().indexOf(".mod") > 0) {
+			 * tree.collapseRow(row - 1); } // System.out.println(tp);
+			 * tree.expandRow(row); row++; }
+			 */
+			showStatus();
+		}
+	}
+
+	String findVlc(File src) {
+		String path = null;
+
+		// System.out.println(src);
+
+		if (src.isDirectory()) {
+			String[] files = src.list();
+			if (files == null)
+				return null;
+			for (String file : files) {
+				File srcFile = new File(src, file);
+				path = findVlc(srcFile);
+				if (path != null)
+					return path;
+			}
+		} else {
+
+			String filename = src.getPath().toString();
+			if (filename.endsWith("vlc.exe"))
+				return src.getPath().toString();
+		}
+		return null;
 	}
 
 	ArrayList<Video> getVideo(File src, ArrayList<Video> vlist) {
@@ -230,11 +275,6 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 			// System.out.println(file);
 
 			// System.out.println(os);
-			String vlcPath = "";
-			if (os.startsWith("windows"))
-				vlcPath = "C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe";
-			if (os.startsWith("mac"))
-				vlcPath = "/Applications/VLC.app";
 
 			long start = System.currentTimeMillis();
 
@@ -246,31 +286,29 @@ public class FVL2 extends JFrame implements TreeSelectionListener, WindowListene
 				pb = new ProcessBuilder("open", "-W", "-a", vlcPath, file);
 			}
 			Process process = pb.start();
-			//pb.redirectErrorStream(true);
-			//System.out.println(file);
+			// pb.redirectErrorStream(true);
+			// System.out.println(file);
 
 			InputStream is = process.getErrorStream();
 			try {
-				while (is.read() >= 0){
-					//printInputStream(is); // 標準出力だけ読み込めばよい
-					//System.out.println("AAA");
+				while (is.read() >= 0) {
+					// printInputStream(is); // 標準出力だけ読み込めばよい
+					// System.out.println("AAA");
 				}
 			} finally {
 				is.close();
 			}
 
 			process.waitFor();
-			
-			/*
-			System.out.println("Return: " + ret);
 
-			InputStream is1 = process.getInputStream();	//標準出力
-			System.out.println("Output");
-			printInputStream(is1);
-			InputStream es = process.getErrorStream();	//標準エラー
-			System.out.println("Error");
-			printInputStream(es);			
-			*/
+			/*
+			 * System.out.println("Return: " + ret);
+			 * 
+			 * InputStream is1 = process.getInputStream(); //標準出力
+			 * System.out.println("Output"); printInputStream(is1); InputStream
+			 * es = process.getErrorStream(); //標準エラー
+			 * System.out.println("Error"); printInputStream(es);
+			 */
 
 			long end = System.currentTimeMillis();
 			// System.out.println(""+end+":"+start+":"+(end-start));
