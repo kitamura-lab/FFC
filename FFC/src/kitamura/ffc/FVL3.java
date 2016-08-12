@@ -82,7 +82,7 @@ public class FVL3 extends JFrame implements TreeSelectionListener, WindowListene
 		model = (DefaultTreeModel) tree.getModel();
 		tree.addTreeSelectionListener(this);
 		ShowObjectHandler listener = new ShowObjectHandler();
-		//tree.addMouseListener(listener); // マウスイベント
+		tree.addMouseListener(listener); // マウスイベント
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.getViewport().setView(tree);
