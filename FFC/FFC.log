@@ -1,0 +1,10 @@
+8 01, 2016 5:24:55 午後 kitamura.ffc.FFC2 setting
+重大: ERROR:
+java.lang.NumberFormatException: For input string: "C:\Users\Public\PRACTICE"
+	at java.lang.NumberFormatException.forInputString(Unknown Source)
+	at java.lang.Integer.parseInt(Unknown Source)
+	at java.lang.Integer.parseInt(Unknown Source)
+	at kitamura.ffc.FFC2.setting(FFC2.java:161)
+	at kitamura.ffc.FFC2.<init>(FFC2.java:116)
+	at kitamura.ffc.FFC2.main(FFC2.java:67)
+
