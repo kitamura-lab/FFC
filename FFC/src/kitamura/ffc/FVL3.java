@@ -25,10 +25,14 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
+import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.ExpandVetoException;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 public class FVL3 extends JFrame implements TreeSelectionListener, WindowListener {
@@ -81,8 +85,10 @@ public class FVL3 extends JFrame implements TreeSelectionListener, WindowListene
 		tree = new JTree(root);
 		model = (DefaultTreeModel) tree.getModel();
 		tree.addTreeSelectionListener(this);
-		ShowObjectHandler listener = new ShowObjectHandler();
-		tree.addMouseListener(listener); // マウスイベント
+		// ShowObjectHandler listener = new ShowObjectHandler();
+		// tree.addMouseListener(listener); // マウスイベント
+		TreeWillExpandListener tel = new ExpandListener();
+		tree.addTreeWillExpandListener(tel);
 
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.getViewport().setView(tree);
@@ -122,7 +128,8 @@ public class FVL3 extends JFrame implements TreeSelectionListener, WindowListene
 		db = new Database();
 
 		if (vlcPath != null) {
-			addVideo();
+			root.setUserObject(new DefaultMutableTreeNode("."));
+			addVideo(new File("."), root, false);
 			tree.expandRow(0);
 			showStatus();
 		}
@@ -191,26 +198,45 @@ public class FVL3 extends JFrame implements TreeSelectionListener, WindowListene
 		return vlist;
 	}
 
-	void addVideo() {
+	void addVideo(File src, DefaultMutableTreeNode node, boolean cont) {
 
-		root.setUserObject(new DefaultMutableTreeNode("."));
+		// root.setUserObject(new DefaultMutableTreeNode("."));
 		// root.add(new DefaultMutableTreeNode("."+delimiter));
 
-		File src = new File(".");
+		// File src = new File(".");
 		if (src.isDirectory()) {
 			String[] files = src.list();
 			for (String file : files) {
 				// DefaultMutableTreeNode node1 = new
 				// DefaultMutableTreeNode(file);
 
+				for (int i = 0; i < node.getChildCount(); i++) {
+					System.out.println(node.getChildAt(i) + ":" + file);
+					if (node.getChildAt(i).toString().equals(file)) {
+						System.out.println("MATCH:" + node.getChildAt(i) + ":" + file);
+						return;
+					}
+				}
+
 				File srcFile = new File(src, file);
-				if (srcFile.isDirectory() || checkSuffix(file)) {
-					root.add(new DefaultMutableTreeNode(file));
+				if (srcFile.isDirectory()) {
+					DefaultMutableTreeNode node1 = new DefaultMutableTreeNode(file);
+					node.add(node1);
+					if (cont) {
+						addVideo(srcFile, node1, false);
+					}
+					// System.out.println(srcFile.toString());
+				} else if (checkSuffix(file)) {
+					node.add(new DefaultMutableTreeNode(file));
 					// System.out.println(srcFile.toString());
 				}
 
 			}
+		} else {
+			node.add(new DefaultMutableTreeNode(src));
 		}
+
+		// System.out.println("TEST");
 
 		return;
 
@@ -287,81 +313,73 @@ public class FVL3 extends JFrame implements TreeSelectionListener, WindowListene
 
 	public void valueChanged(TreeSelectionEvent e) {
 
-		TreePath path = tree.getSelectionPath();
-		if (path == null)
-			return;
-		DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-		// node = root;
+		try {
 
-		String pathname = node.toString();
-		// System.out.println(pathname);
+			TreePath path = tree.getSelectionPath();
+			if (path == null)
+				return;
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+			DefaultMutableTreeNode node0 = node;
+			String headerfile = node.toString();
+			String file = headerfile.substring(headerfile.indexOf("]") + 1);
+			// file = headerfile;
+			// System.out.println(file);
+			while (node.getParent() != null) {
+				file = node.getParent().toString() + delimiter + file;
+				node = (DefaultMutableTreeNode) node.getParent();
+			}
+			// file = "." + delimiter + file;
+			// file = "C:"+delimiter + file;
+			// file = delimiter + file;
+			// System.out.println(file);
 
-		DefaultMutableTreeNode node0 = node;
-		while (node0.getParent() != null) {
-			pathname = node0.getParent().toString() + delimiter + pathname;
-			node0 = (DefaultMutableTreeNode) node0.getParent();
-		}
+			// System.out.println(os);
 
-		// String headerfile = node.toString();
-		System.out.println(pathname);
+			long start = System.currentTimeMillis();
 
-		File src = new File(pathname);
-		if (src.isDirectory()) {
-			String[] files = src.list();
-			for (String file : files) {
-				// DefaultMutableTreeNode node1 = new
-				// DefaultMutableTreeNode(file);
+			ProcessBuilder pb = null;
+			// logger.log(Level.INFO,vlcPath+" "+file);
+			if (os.startsWith("windows"))
+				pb = new ProcessBuilder(vlcPath, file);
+			if (os.startsWith("mac")) {
+				pb = new ProcessBuilder("open", "-W", "-a", vlcPath, file);
+			}
+			Process process = pb.start();
+			// pb.redirectErrorStream(true);
+			// System.out.println(file);
 
-				File srcFile = new File(src, file);
-				if (srcFile.isDirectory() || checkSuffix(file)) {
-					node.add(new DefaultMutableTreeNode(file));
-					System.out.println(srcFile.toString());
+			InputStream is = process.getErrorStream();
+			try {
+				while (is.read() >= 0) {
+					// printInputStream(is); // 標準出力だけ読み込めばよい
+					// System.out.println("AAA");
 				}
-
+			} finally {
+				is.close();
 			}
 
-		}
-		// tree.expandPath(path);
+			process.waitFor();
 
-		/*
-		 * try {
-		 * 
-		 * 
-		 * DefaultMutableTreeNode node0 = node;
-		 * 
-		 * String file = headerfile.substring(headerfile.indexOf("]") + 1); //
-		 * file = headerfile; // System.out.println(file); while
-		 * (node.getParent() != null) { file = node.getParent().toString() +
-		 * delimiter + file; node = (DefaultMutableTreeNode) node.getParent(); }
-		 * // file = "." + delimiter + file; // file = "C:"+delimiter + file; //
-		 * file = delimiter + file; // System.out.println(file);
-		 * 
-		 * // System.out.println(os);
-		 * 
-		 * long start = System.currentTimeMillis();
-		 * 
-		 * ProcessBuilder pb = null; // logger.log(Level.INFO,vlcPath+" "+file);
-		 * if (os.startsWith("windows")) pb = new ProcessBuilder(vlcPath, file);
-		 * if (os.startsWith("mac")) { pb = new ProcessBuilder("open", "-W",
-		 * "-a", vlcPath, file); } Process process = pb.start(); //
-		 * pb.redirectErrorStream(true); // System.out.println(file);
-		 * 
-		 * InputStream is = process.getErrorStream(); try { while (is.read() >=
-		 * 0) { // printInputStream(is); // 標準出力だけ読み込めばよい //
-		 * System.out.println("AAA"); } } finally { is.close(); }
-		 * 
-		 * process.waitFor();
-		 * 
-		 * 
-		 * long end = System.currentTimeMillis(); //
-		 * System.out.println(""+end+":"+start+":"+(end-start));
-		 * db.putWatchTime((int) (end - start) / 1000);
-		 * 
-		 * checkVideo(node0);
-		 * 
-		 * tree.clearSelection(); } catch (Exception ex) { ex.printStackTrace();
-		 * logger.log(Level.SEVERE, "ERROR:", ex); }
-		 */
+			/*
+			 * System.out.println("Return: " + ret);
+			 * 
+			 * InputStream is1 = process.getInputStream(); //標準出力
+			 * System.out.println("Output"); printInputStream(is1); InputStream
+			 * es = process.getErrorStream(); //標準エラー
+			 * System.out.println("Error"); printInputStream(es);
+			 */
+
+			long end = System.currentTimeMillis();
+			// System.out.println(""+end+":"+start+":"+(end-start));
+			db.putWatchTime((int) (end - start) / 1000);
+
+			checkVideo(node0);
+
+			tree.clearSelection();
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			logger.log(Level.SEVERE, "ERROR:", ex);
+		}
 	}
 
 	public static void printInputStream(InputStream is) throws IOException {
@@ -371,7 +389,7 @@ public class FVL3 extends JFrame implements TreeSelectionListener, WindowListene
 				String line = br.readLine();
 				if (line == null)
 					break;
-				System.out.println(line);
+				// System.out.println(line);
 			}
 		} finally {
 			br.close();
@@ -443,7 +461,7 @@ public class FVL3 extends JFrame implements TreeSelectionListener, WindowListene
 						// System.out.println(obj);
 					}
 					file = file.substring(1);
-					System.out.println(file);
+					// System.out.println(file);
 
 					long start = System.currentTimeMillis();
 
@@ -493,5 +511,39 @@ public class FVL3 extends JFrame implements TreeSelectionListener, WindowListene
 			}
 		}
 
+	}
+
+	class ExpandListener implements TreeWillExpandListener {
+
+		// ツリーを開く際に呼ばれる
+		@Override
+		public void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
+
+			TreePath path = event.getPath();
+			TreeNode obj = (TreeNode) path.getLastPathComponent(); // 一番末端の(今回開こうとしている)ノード
+			String file = "";
+			for (Object o : path.getPath()) {
+				file = file + delimiter + o;
+				System.out.println(obj);
+			}
+			file = file.substring(1);
+			// System.out.println(file);
+			// if (obj instanceof LazyTreeNode) {
+			// LazyTreeNode node = (LazyTreeNode) obj;
+			// node.addChildNodes(); //子ノードにデータを追加する
+			// }
+			for (int i = 0; i < obj.getChildCount(); i++) {
+				System.out.println(obj.getChildAt(i));
+				// ここに追加
+				File f = new File(file + delimiter + obj.getChildAt(i));
+				if (f.isDirectory())
+					addVideo(f, (DefaultMutableTreeNode) obj.getChildAt(i), false);
+			}
+		}
+
+		// ツリーを閉じる際に呼ばれる
+		@Override
+		public void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
+		}
 	}
 }
