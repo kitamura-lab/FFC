@@ -45,7 +45,7 @@ public class FFC3 extends JFrame implements WindowListener {
 
 	private static final long serialVersionUID = 1L;
 
-	static String version = "3.2";
+	static String version = "3.3";
 	final String logfile = "FFC.log";
 	private Logger logger = null;
 
@@ -190,7 +190,7 @@ public class FFC3 extends JFrame implements WindowListener {
 			// 例外発生時処理
 			ex.printStackTrace();
 			logger.log(Level.SEVERE, "ERROR:", ex);
-			label3.setText(ex.toString());
+			label1.setText(ex.toString());
 
 		}
 	}
@@ -269,7 +269,7 @@ public class FFC3 extends JFrame implements WindowListener {
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				logger.log(Level.SEVERE, "ERROR:", ex);
-				label3.setText(ex.toString());
+				label1.setText(ex.toString());
 				;
 			}
 			label2.setText("COPYING:" + src.getAbsolutePath().toString());
